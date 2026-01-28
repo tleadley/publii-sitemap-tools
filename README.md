@@ -27,9 +27,9 @@ Bash
 
 ### 2. Deployment
 
-- Script: Copy generate_sitemap.py to /usr/local/bin/ and update your PUBLIC_URL.
-- Styles: Drop sitemap.xsl into your web root (e.g., /var/www/html/).
-- Automation: Copy the .service and .path files to /etc/systemd/system/.
+- **Script:** Copy generate_sitemap.py to /usr/local/bin/ and update your PUBLIC_URL.
+- **Styles:** Drop sitemap.xsl into your web root (e.g., /var/www/html/).
+- **Automation:** Copy the .service and .path files to /etc/systemd/system/.
 
 ### 3. Activation
 
@@ -43,18 +43,18 @@ sudo systemctl enable --now sitemap-gen.path
 
 ## 📂 Project Structure
 
-- generate_sitemap.py: The Python 3 engine.
-- sitemap.xsl: The visual stylesheet for the browser.
-- sitemap-gen.service: Systemd task runner (handles permissions + execution).
-- sitemap-gen.path: Systemd directory monitor.
+- **generate_sitemap.py:** The Python 3 engine.
+- **sitemap.xsl:** The visual stylesheet for the browser.
+- **sitemap-gen.service:** Systemd task runner (handles permissions + execution).
+- **sitemap-gen.path:** Systemd directory monitor.
 
 ## 🛠 Configuration
 
 Inside generate_sitemap.py, you can customize:
 
-- SITE_DIR: Path to your web files.
-- PUBLIC_URL: Your live domain (FQDN).
-- EXCLUDE_FOLDERS: A list of folders (e.g., tags, assets) to ignore.
+- **SITE_DIR:** Path to your web files.
+- **PUBLIC_URL:** Your live domain (FQDN).
+- **EXCLUDE_FOLDERS:** A list of folders (e.g., tags, assets) to ignore.
 
 ## 🔒 Security
 
@@ -67,9 +67,9 @@ By avoiding npm, this workflow eliminates supply-chain vulnerabilities. The auto
 
 To ensure this tool works correctly with your Publii setup:
 
-- URLs: Set your Publii site to use Relative URLs (found in Site Settings).
-- SEO: Disable the internal sitemap generation in Publii (SEO -> Sitemap).
-- Sync: Configure your sync method (SFTP/SSH) to target your Debian server's web root (e.g., /var/www/html).
+- **URLs:** Set your Publii site to use Relative URLs (found in Site Settings).
+- **SEO:** Disable the internal sitemap generation in Publii (SEO -> Sitemap).
+- **Sync:** Configure your sync method (SFTP/SSH) to target your Debian server's web root (e.g., /var/www/html).
 
 ### 2. First-Time Setup on Server
 
