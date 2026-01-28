@@ -1,0 +1,7 @@
+[Unit]
+Description=Generate Sitemap after Publii Sync
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/local/bin/generate_sitemap.py
+User=www-data
