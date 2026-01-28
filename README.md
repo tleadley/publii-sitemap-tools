@@ -136,6 +136,7 @@ If you pull updates from this repository to your server:
 ```
 Bash
 
+cd ~/sitemap-tools
 git pull
 sudo ./deploy.sh
 
