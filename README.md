@@ -10,12 +10,12 @@ This project solves the "Relative URL" conflict in Publii: it allows you to main
 
 ## ✨ Features
 
-- Zero Dependencies (Almost): No Node.js or npm required. Uses native Python 3 and BeautifulSoup4.
-- Absolute URL Mapping: Automatically prepends your public domain to relative paths.
-- Full Image SEO: Maps every <image:image> location, not just a count.
-- Professional Styling: Includes an XSLT stylesheet to make sitemaps human-readable.
-- Linux Native Automation: Uses Systemd Path Units to trigger updates the millisecond you sync from Publii.
-- Permission Auto-Fix: Automatically handles "root-owned" file issues by resetting ownership to www-data.
+- **Zero Dependencies (Almost):** No Node.js or npm required. Uses native Python 3 and BeautifulSoup4.
+- **Absolute URL Mapping:** Automatically prepends your public domain to relative paths.
+- **Full Image SEO:** Maps every <image:image> location.
+- **Professional Styling:** Includes an XSLT stylesheet to make sitemaps human-readable.
+- **Linux Native Automation:** Uses Systemd Path Units to trigger updates the millisecond you sync from Publii.
+- **Permission Auto-Fix:** Automatically handles "root-owned" file issues by resetting ownership to www-data.
 
 ## 🚀 Installation
 ### 1. Prerequisites
