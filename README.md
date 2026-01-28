@@ -59,8 +59,8 @@ Inside generate_sitemap.py, you can customize:
 ## 🔒 Security
 
 By avoiding npm, this workflow eliminates supply-chain vulnerabilities. The automation runs as root only for the duration of the permission reset and sitemap generation, ensuring the web root stays owned by www-data for safe serving by lighttpd.
-📄 License
-Public Domain / CC0 (Copyleft). Feel free to use, modify, and share.
+
+#### 📄 License Public Domain / CC0 (Copyleft). Feel free to use, modify, and share.
 
 ## 📖 How to Use
 ### 1. Configure Publii
