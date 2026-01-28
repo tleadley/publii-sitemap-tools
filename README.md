@@ -32,10 +32,13 @@ Bash
 - Automation: Copy the .service and .path files to /etc/systemd/system/.
 
 ### 3. Activation
-Bash
+
 ```
+Bash
+
 sudo systemctl daemon-reload
 sudo systemctl enable --now sitemap-gen.path
+
 ```
 
 ## 📂 Project Structure
@@ -71,20 +74,27 @@ To ensure this tool works correctly with your Publii setup:
 ### 2. First-Time Setup on Server
 
 Clone this repository to your user's home directory on the server:
-Bash
+
 ```
+Bash
+
 git clone https://github.com/yourusername/publii-sitemap-tools.git ~/sitemap-tools
 cd ~/sitemap-tools
-```
-Edit src/generate_sitemap.py and set your PUBLIC_URL to your live domain:
-Python
 
-PUBLIC_URL = "https://yourdomain.com"
+```
+
+Edit src/generate_sitemap.py and set your PUBLIC_URL to your live domain:
+
+``` PUBLIC_URL = "https://yourdomain.com" ```
 
 Run the installer:
+
+```
 Bash
 
-```sudo ./deploy.sh```
+sudo ./deploy.sh
+
+```
 
 ### 3. The Workflow
 
@@ -98,11 +108,17 @@ Once installed, you never need to run the script manually again:
 ### 4. Verification
 
 You can verify the automation is running by checking the Systemd logs:
+
+```
 Bash
 
-```journalctl -u sitemap-gen.service -f```
+journalctl -u sitemap-gen.service -f
+
+```
 
 Or by visiting your sitemap in a browser: https://yourdomain.com/sitemap.xml. You should see a styled, human-readable table containing all your pages and image locations.
+
+---
 
 ## 🛠 Troubleshooting
 
@@ -112,12 +128,17 @@ Or by visiting your sitemap in a browser: https://yourdomain.com/sitemap.xml. Yo
 | Permission Denied | Publii synced as root | The service handles this, but ensure deploy.sh was run with sudo.|
 | No images in sitemap | Script didn't find <img> tags | Ensure your images are not loaded via external JavaScript (lazy-loading is fine if src is present).|
 
+
 ## 🔄 Updating the Tools
 
 If you pull updates from this repository to your server:
-Bash
+
 ```
+Bash
+
 git pull
 sudo ./deploy.sh
+
 ```
+
 This will automatically refresh the Python logic and restart the path watcher.
