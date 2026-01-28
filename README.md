@@ -27,7 +27,7 @@ This project solves the "Relative URL" conflict in Publii: it allows you to main
 Install the Python HTML parser on your Debian server:
 Bash
 
-sudo apt update && sudo apt install python3-bs4
+```sudo apt update && sudo apt install python3-bs4```
 
 2. Deployment
 
@@ -39,9 +39,10 @@ sudo apt update && sudo apt install python3-bs4
 
 3. Activation
 Bash
-
+```
 sudo systemctl daemon-reload
 sudo systemctl enable --now sitemap-gen.path
+```
 
 📂 Project Structure
 
