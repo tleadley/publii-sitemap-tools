@@ -6,7 +6,7 @@
 
 A secure, lightweight post-processing solution for Publii sites hosted on Debian/lighttpd.
 
-This project solves the "Relative URL" conflict in Publii: it allows you to maintain relative URLs for internal networking (Split DNS) while automatically generating a professional, absolute-URL sitemap.xml with full Google Image SEO support.
+This project solves the "Relative URL" conflict in Publii: it allows you to maintain relative URLs for internal networking (Split DNS) while automatically generating a professional, absolute-URL sitemap.xml with full Google SEO support.
 
 ## ✨ Features
 
