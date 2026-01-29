@@ -141,6 +141,9 @@ git pull
 sudo chmod +x deploy.sh
 sudo ./deploy.sh
 
+systemctl daemon-reload
+systemctl restart sitemap-gen.path
+systemctl reset-failed sitemap-gen.service
 ```
 
 This will automatically refresh the Python logic and restart the path watcher.
