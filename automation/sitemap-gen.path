@@ -1,22 +1,9 @@
 [Unit]
-Description=Generate Sitemap after Publii Sync
+Description=Watch /var/www for changes
 
-[Unit]
-Description=Fix Permissions and Generate Sitemap
-After=network.target
-
-[Service]
-Type=oneshot
-User=root
-Group=root
-
-# Fix ownership and permissions before running the script
-ExecStartPre=/bin/chown -R www-data:www-data /var/www/html
-ExecStartPre=/usr/bin/find /var/www/html -type d -exec chmod 755 {} +
-ExecStartPre=/usr/bin/find /var/www/html -type f -exec chmod 644 {} +
-
-# Run the generator
-ExecStart=/usr/bin/python3 /usr/local/bin/generate_sitemap.py
+[Path]
+PathChanged=/var/www/
+DelaySec=15
 
 [Install]
-WantedBy=multi-user.target 
+WantedBy=multi-user.target
