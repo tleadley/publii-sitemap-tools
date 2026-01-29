@@ -40,7 +40,6 @@ def generate():
 
                 items.append({'loc': page_url, 'images': list(set(images))})
 
-             
     # This block must be aligned with the "for root..." loop
     xml = [
         '<?xml version="1.0" encoding="UTF-8"?>',
