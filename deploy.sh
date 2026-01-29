@@ -10,13 +10,17 @@ if [ "$EUID" -ne 0 ]; then
   echo "❌ Please run as root."
   exit
 fi
+
 apt update
+
 apt install python3-bs4 -y
+
 echo "📦 Deploying from Git repository..."
 
 # Copy Python Logic
 cp $SCRIPT_SRC $SCRIPT_DEST
 chmod +x $SCRIPT_DEST
+sed -i 's/\xc2\xa0/ /g' /usr/local/bin/generate_sitemap.py
 
 # Copy Stylesheet
 cp $XSL_SRC "$WEB_ROOT/sitemap.xsl"
