@@ -10,7 +10,8 @@ if [ "$EUID" -ne 0 ]; then
   echo "❌ Please run as root."
   exit
 fi
-
+apt update
+apt install python3-bs4 -y
 echo "📦 Deploying from Git repository..."
 
 # Copy Python Logic
