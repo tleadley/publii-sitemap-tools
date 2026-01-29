@@ -12,7 +12,7 @@ Group=root
 
 # Fix ownership and permissions before running the script
 ExecStartPre=/bin/chown -R www-data:www-data /var/www/html
-ExecStartPre=/usr/bin/find /var/www/html-type d -exec chmod 755 {} +
+ExecStartPre=/usr/bin/find /var/www/html -type d -exec chmod 755 {} +
 ExecStartPre=/usr/bin/find /var/www/html -type f -exec chmod 644 {} +
 
 # Run the generator
