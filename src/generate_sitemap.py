@@ -4,29 +4,28 @@ import grp
 from bs4 import BeautifulSoup
 
 # --- CONFIGURATION ---
-SITE_DIR = "/var/www/html"          
-PUBLIC_URL = "https://yourdomain.com" 
+SITE_DIR = "/var/www/html"
+PUBLIC_URL = "https://yourdomain.com"
 OUTPUT_FILE = os.path.join(SITE_DIR, "sitemap.xml")
-EXCLUDE_FOLDERS = {'assets', 'cgi-bin', 'tmp', '404', 'tags', 'authors'} 
+EXCLUDE_FOLDERS = {'assets', 'cgi-bin', 'tmp', '404', 'tags', 'authors'}
 # ---------------------
 
 def generate():
     items = []
-    
+
     for root, dirs, files in os.walk(SITE_DIR):
         # Skip excluded folders
         dirs[:] = [d for d in dirs if d not in EXCLUDE_FOLDERS]
-        
-        for file in files:
+    for file in files:
             if file.endswith(".html"):
                 full_path = os.path.join(root, file)
                 rel_path = os.path.relpath(full_path, SITE_DIR).replace("\\", "/")
-                
+
                 # Clean URL formatting
                 clean_path = rel_path.replace("index.html", "")
                 page_url = f"{PUBLIC_URL}/{clean_path}".rstrip("/")
                 if not clean_path: page_url = f"{PUBLIC_URL}/"
-                
+
                 images = []
                 try:
                     with open(full_path, 'r', encoding='utf-8') as f:
@@ -38,9 +37,10 @@ def generate():
                                 images.append(img_url)
                 except Exception as e:
                     print(f"Error reading {full_path}: {e}")
-                    
+
                 items.append({'loc': page_url, 'images': list(set(images))})
-                
+
+             
     # This block must be aligned with the "for root..." loop
     xml = [
         '<?xml version="1.0" encoding="UTF-8"?>',
@@ -60,7 +60,7 @@ def generate():
     xml.append('</urlset>')
 
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
-        f.write('\n'.join(xml)) 
+        f.write('\n'.join(xml))
 
     # Force ownership of the generated file to www-data
     uid = pwd.getpwnam("www-data").pw_uid
