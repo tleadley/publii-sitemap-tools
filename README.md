@@ -33,9 +33,9 @@ Bash
 
 ### 3. Activation
 
-```
-Bash
+```Bash```
 
+```
 sudo systemctl daemon-reload
 sudo systemctl enable --now sitemap-gen.path
 
@@ -75,9 +75,9 @@ To ensure this tool works correctly with your Publii setup:
 
 Clone this repository to your user's home directory on the server:
 
-```
-Bash
+```Bash```
 
+```
 git clone https://github.com/tleadley/publii-sitemap-tools.git ~/sitemap-tools
 cd ~/sitemap-tools
 
@@ -89,8 +89,9 @@ Edit src/generate_sitemap.py and set your PUBLIC_URL to your live domain:
 
 Run the installer:
 
+```Bash```
+
 ```
-Bash
 sudo chmod +x deploy.sh
 sudo ./deploy.sh
 
@@ -109,9 +110,9 @@ Once installed, you never need to run the script manually again:
 
 You can verify the automation is running by checking the Systemd logs:
 
-```
-Bash
+```Bash```
 
+```
 journalctl -u sitemap-gen.service -f
 
 ```
@@ -133,17 +134,30 @@ Or by visiting your sitemap in a browser: https://yourdomain.com/sitemap.xml. Yo
 
 If you pull updates from this repository to your server:
 
-```
-Bash
+```Bash```
 
+```
 cd ~/sitemap-tools
 git pull
 sudo chmod +x deploy.sh
 sudo ./deploy.sh
 
-systemctl daemon-reload
-systemctl restart sitemap-gen.path
-systemctl reset-failed sitemap-gen.service
+```
+Applying the Update
+
+Run these commands to clear the error and apply the new logic:
+
+```Bash```
+
+```
+# 1. Reload the units
+sudo systemctl daemon-reload
+
+# 2. Reset the failed state of the service
+sudo systemctl reset-failed sitemap-gen.service
+
+# 3. Restart the path watcher
+sudo systemctl restart sitemap-gen.path
 ```
 
 This will automatically refresh the Python logic and restart the path watcher.
