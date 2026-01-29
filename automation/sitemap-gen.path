@@ -1,8 +1,8 @@
 [Unit]
-Description=Watch /var/www for changes
+Description=Watch /var/www/html for changes
 
 [Path]
-PathChanged=/var/www/
+PathChanged=/var/www/html/
 DelaySec=15
 
 [Install]
