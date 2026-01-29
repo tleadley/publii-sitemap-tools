@@ -6,7 +6,7 @@ SCRIPT_SRC="src/generate_sitemap.py"
 XSL_SRC="src/sitemap.xsl"
 SCRIPT_DEST="/usr/local/bin/generate_sitemap.py"
 
-if [ "$EUID" -ne 0 ]; then 
+if [ "$EUID" -ne 0 ]; then
   echo "❌ Please run as root."
   exit
 fi
