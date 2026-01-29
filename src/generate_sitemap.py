@@ -26,7 +26,7 @@ def generate():
                 clean_path = rel_path.replace("index.html", "")
                 page_url = f"{PUBLIC_URL}/{clean_path}".rstrip("/")
                 if not clean_path: page_url = f"{PUBLIC_URL}/"
-
+                
                 images = []
                 try:
                     with open(full_path, 'r', encoding='utf-8') as f:
@@ -38,9 +38,9 @@ def generate():
                                 images.append(img_url)
                 except Exception as e:
                     print(f"Error reading {full_path}: {e}")
-                
+                    
                 items.append({'loc': page_url, 'images': list(set(images))})
-
+                
     # This block must be aligned with the "for root..." loop
     xml = [
         '<?xml version="1.0" encoding="UTF-8"?>',
