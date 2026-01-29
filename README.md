@@ -78,7 +78,7 @@ Clone this repository to your user's home directory on the server:
 ```
 Bash
 
-git clone https://github.com/yourusername/publii-sitemap-tools.git ~/sitemap-tools
+git clone https://github.com/tleadley/publii-sitemap-tools.git ~/sitemap-tools
 cd ~/sitemap-tools
 
 ```
@@ -91,7 +91,7 @@ Run the installer:
 
 ```
 Bash
-
+sudo chmod +x deploy.sh
 sudo ./deploy.sh
 
 ```
@@ -138,6 +138,7 @@ Bash
 
 cd ~/sitemap-tools
 git pull
+sudo chmod +x deploy.sh
 sudo ./deploy.sh
 
 ```
