@@ -68,6 +68,6 @@ def generate():
     os.chown(OUTPUT_FILE, uid, gid)
     os.chmod(OUTPUT_FILE, 0o644)
 
- if __name__ == "__main__":
+if __name__ == "__main__":
     generate()
     print(f"Sitemap successfully generated at {OUTPUT_FILE}")
