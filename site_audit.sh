@@ -205,8 +205,9 @@ else
     echo -e "  [${GREEN}PASS${NC}] Script execution is disabled (Raw source or 403/404 returned)."
 fi
 
+echo -e "\n${BLUE}[9]Debug Leak Test${NC}"
 # --- [TEST] Internal Trust & Debug Headers ---
-echo -e "\n${BLUE}[TEST]Testing Internal Trust Logic${NC}"
+echo -e "${BLUE}  Testing Internal Trust Logic${NC}"
 
 # We simulate a request from a trusted internal IP
 TEST_IP="$SERVER_IP"
@@ -219,7 +220,7 @@ else
 fi
 
 # --- [TEST] External Masking ---
-echo -e "\n${BLUE}[TEST}Testing External Masking${NC}"
+echo -e "${BLUE}  Testing External Masking${NC}"
 
 # We simulate a request from a public IP (e.g., Google DNS)
 EXTERNAL_CHECK=$(curl -s -I -H "X-Forwarded-For: 8.8.8.8" http://localhost | grep "X-Debug")
