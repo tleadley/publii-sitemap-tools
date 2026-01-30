@@ -61,10 +61,7 @@ def generate():
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         f.write('\n'.join(xml))
 
-    # Force ownership of the generated file to www-data
-    uid = pwd.getpwnam("www-data").pw_uid
-    gid = grp.getgrnam("www-data").gr_gid
-    os.chown(OUTPUT_FILE, uid, gid)
+    # Force permission of the generated file read only
     os.chmod(OUTPUT_FILE, 0o644)
 
 if __name__ == "__main__":
