@@ -61,6 +61,8 @@ else
     echo -e "  [${RED}FAIL${NC}] Slashed URL did not trigger 302 Redirect. (Got $R302)."
 fi
 
+rm -rf "$DOC_ROOT/testdir"
+
 # 4. Lua Script Protection
 LUA_PATH=$(lighttpd -p -f /etc/lighttpd/lighttpd.conf | grep "magnet.attract-physical-path-to" | awk -F '"' '{print $2}')
 if [ -f "$LUA_PATH" ]; then
