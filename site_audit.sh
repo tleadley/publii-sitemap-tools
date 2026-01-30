@@ -128,8 +128,9 @@ for IP in $LISTEN_IPS; do
         else
             echo -e "  [${RED}CRITICAL${NC}] Firewall is DISABLED! Global interface is fully exposed."
         fi
-   fi
+    fi
 done
+
 echo -e "  ${BLUE}--- IPv6 Exposure Audit ---${NC}"
 
 # 1. Check if the server is actually listening on IPv6
@@ -166,6 +167,7 @@ if [ ! -z "$NOSNIFF_CHECK" ]; then
 else
     echo -e "  [${RED}FAIL${NC}] Missing 'nosniff' header. Browsers may try to execute data as code."
 fi
+
 # 2. Test Default MIME-Type Handling
 # Create a file with no extension
 touch "$DOC_ROOT/mime_test_file"
@@ -180,8 +182,31 @@ else
     echo -e "  [${YELLOW}INFO${NC}] Unknown file MIME-type: $(echo $MIME_RESPONSE | awk '{print $2}')"
 fi
 
+echo -e "\n${BLUE}[7] Resource Exhaustion (DoS) Protection${NC}"
+# Extract timeouts from live config
+READ_IDLE=$(lighttpd -p -f /etc/lighttpd/lighttpd.conf | grep "server.max-read-idle" | awk '{print $3}' | tr -d '"')
+
+if [ -n "$READ_IDLE" ] && [ "$READ_IDLE" -le 15 ]; then
+    echo -e "  [${GREEN}PASS${NC}] Aggressive read-idle timeout set ($READ_IDLE seconds)."
+else
+    echo -e "  [${RED}FAIL${NC}] Timeout too high or not set. (Current: ${READ_IDLE:-60}s). Risk of Slowloris."
+fi
+
+echo -e "\n${BLUE}[8] Execution Policy Audit${NC}"
+echo "<?php echo 'PHP_IS_ACTIVE'; ?>" > "$DOC_ROOT/security_probe.php"
+PROBE_RES=$(curl -s http://localhost/security_probe.php)
+rm "$DOC_ROOT/security_probe.php"
+
+# If the output is EXACTLY 'PHP_IS_ACTIVE', then it was executed.
+# If the output still contains '<?php', it was served as safe static text.
+if [[ "$PROBE_RES" == "PHP_IS_ACTIVE" ]]; then
+    echo -e "  [${RED}FAIL${NC}] PHP/CGI execution is active! Server is not strictly static."
+else
+    echo -e "  [${GREEN}PASS${NC}] Script execution is disabled (Raw source or 403/404 returned)."
+fi
+
 # --- [TEST] Internal Trust & Debug Headers ---
-echo -e "\n${BLUE}[TEST}Testing Internal Trust Logic${NC}"
+echo -e "\n${BLUE}[TEST]Testing Internal Trust Logic${NC}"
 
 # We simulate a request from a trusted internal IP
 TEST_IP="$SERVER_IP"
@@ -204,7 +229,6 @@ if [[ -z "$EXTERNAL_CHECK" ]]; then
 else
     echo -e "  [${RED}FAIL${NC}] SECURITY LEAK: Debug headers visible to public IPs!"
 fi
-
 echo -e "\n====================================================="
 echo -e "${BLUE}                AUDIT COMPLETE                      ${NC} "
 echo -e "====================================================="
