@@ -92,7 +92,7 @@ INTERNAL_NET=$(ip -o -f inet addr show $(ip route | grep default | awk '{print $
 # Detect the server's own internal IP (for debug header testing)
 SERVER_IP=$(hostname -I | awk '{print $1}')
 
-echo -e "  [${BLUE}INFO${NC}] Detected Local Subnet: ${YELLOW}$INTERNAL_NET.x.x${NC} | Internal IP: ${YELLOW}$SERVER_IP${NC}"
+echo -e "  [${YELLOW}INFO${NC}] Detected Local Subnet: ${YELLOW}$INTERNAL_NET.x.x${NC} | Internal IP: ${YELLOW}$SERVER_IP${NC}"
 # 2. Check Interface Binding (0.0.0.0 vs 127.0.0.1)
 LISTEN_IPS=$(ss -tulpn | grep -E ':80|:443' | awk '{print $5}' | sed 's/:[^:]*$//' | sed 's/\[//g; s/\]//g' | sort -u)
 
