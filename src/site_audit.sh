@@ -130,7 +130,7 @@ for IP in $LISTEN_IPS; do
         fi
    fi
 done
-echo -e "\n  --- IPv6 Exposure Audit ---"
+echo -e "  ${BLUE}--- IPv6 Exposure Audit ---${NC}"
 
 # 1. Check if the server is actually listening on IPv6
 IPV6_LISTEN=$(ss -tulpn | grep -E ':80|:443' | grep "\[::\]")
