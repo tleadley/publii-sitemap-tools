@@ -193,7 +193,7 @@ else
 fi
 
 # --- [TEST] External Masking ---
-echo -e "  Testing External Masking... "
+echo -e "\n${BLUE}[TEST}Testing Internal Trust Logic${NC}"
 
 # We simulate a request from a public IP (e.g., Google DNS)
 EXTERNAL_CHECK=$(curl -s -I -H "X-Forwarded-For: 8.8.8.8" http://localhost | grep "X-Debug")
