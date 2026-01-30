@@ -130,7 +130,7 @@ for IP in $LISTEN_IPS; do
         fi
    fi
 done
-echo -e "\n--- IPv6 Exposure Audit ---"
+echo -e "\n  --- IPv6 Exposure Audit ---"
 
 # 1. Check if the server is actually listening on IPv6
 IPV6_LISTEN=$(ss -tulpn | grep -E ':80|:443' | grep "\[::\]")
@@ -193,7 +193,7 @@ else
 fi
 
 # --- [TEST] External Masking ---
-echo -e "\n${BLUE}[TEST}Testing Internal Trust Logic${NC}"
+echo -e "\n${BLUE}[TEST] Testing Internal Trust Logic${NC}"
 
 # We simulate a request from a public IP (e.g., Google DNS)
 EXTERNAL_CHECK=$(curl -s -I -H "X-Forwarded-For: 8.8.8.8" http://localhost | grep "X-Debug")
