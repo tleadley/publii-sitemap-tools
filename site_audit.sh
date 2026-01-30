@@ -180,7 +180,8 @@ else
     echo -e "  [${YELLOW}INFO${NC}] Unknown file MIME-type: $(echo $MIME_RESPONSE | awk '{print $2}')"
 fi
 
-echo -e "  Testing Internal Trust Logic... "
+# --- [TEST] Internal Trust & Debug Headers ---
+echo -e "\n${BLUE}[TEST}Testing Internal Trust Logic${NC}"
 
 # We simulate a request from a trusted internal IP
 TEST_IP="$SERVER_IP"
@@ -193,7 +194,7 @@ else
 fi
 
 # --- [TEST] External Masking ---
-echo -e "\n${BLUE}[TEST] Testing Internal Trust Logic${NC}"
+echo -e "\n${BLUE}[TEST}Testing External Masking${NC}"
 
 # We simulate a request from a public IP (e.g., Google DNS)
 EXTERNAL_CHECK=$(curl -s -I -H "X-Forwarded-For: 8.8.8.8" http://localhost | grep "X-Debug")
