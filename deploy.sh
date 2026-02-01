@@ -41,7 +41,6 @@ fi
 # 2. XSL stylesheet for sitemap
 if [ -f "$XSL_SRC" ]; then
   cp "$XSL_SRC" "$WEB_ROOT/sitemap.xsl"
-  chown www-data:www-data "$WEB_ROOT/sitemap.xsl"
   chmod 644 "$WEB_ROOT/sitemap.xsl"
   echo "   ✓ Copied: sitemap.xsl → $WEB_ROOT/sitemap.xsl"
 else
@@ -51,7 +50,6 @@ fi
 # 3. Lua redirect script for lighttpd (new)
 if [ -f "$LUA_SRC" ]; then
   cp "$LUA_SRC" "$LUA_DEST"
-  chown www-data:www-data "$LUA_DEST"     # lighttpd runs as www-data
   chmod 644 "$LUA_DEST"                   # readable by lighttpd, not writable
   echo "   ✓ Copied: redirect.lua → $LUA_DEST"
 else
