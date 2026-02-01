@@ -11,6 +11,7 @@ set -euo pipefail
 # ufw --force reset
 # ufw default deny incoming
 # ufw default allow outgoing
+# ufw limit from 10.150.16.0/24 to any port 22 proto tcp comment 'Rate-limited internal SSH'
 
 echo "Enabling UFW if not already active..."
 ufw --force enable >/dev/null || true
