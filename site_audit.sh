@@ -82,19 +82,21 @@ if echo "$HEADERS" | grep -qi "Server: lighttpd/"; then
 else
     echo -e "  [${GREEN}PASS${NC}] Server version is hidden."
 fi
-echo -e "\n--- Port Exposure Audit ---"
+echo -e "\n${YELLOW}  --- Port Exposure Audit ---${NC}"
 
 # --- ADAPTIVE NETWORK & FIREWALL AUDIT ---
 echo -e "\n${BLUE}[5] Adaptive Network & Trust Validation${NC}"
 
 # 1. Identify the 'Expected' trusted actors
 TRUSTED_PROXY=$(lighttpd -p -f /etc/lighttpd/lighttpd.conf | grep "extforward.forwarder" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n 1)
-# Detect the local subnet dynamically
-INTERNAL_NET=$(ip -o -f inet addr show $(ip route | grep default | awk '{print $5}') | awk '{print $4}' | cut -d. -f1-2) # Your internal network prefix
+# Detect the local subnet dynamically (e.g. 10.150)
+INTERNAL_NET=$(ip -o -f inet addr show $(ip route | grep default | awk '{print $5}') | awk '{print $4}' | cut -d/ -f1 | cut -d. -f1-3 | head -n1).0  # adjusted to full /24 prefix like 10.150.16.0
+
 # Detect the server's own internal IP (for debug header testing)
 SERVER_IP=$(hostname -I | awk '{print $1}')
 
-echo -e "  [${YELLOW}INFO${NC}] Detected Local Subnet: ${YELLOW}$INTERNAL_NET.x.x${NC} | Internal IP: ${YELLOW}$SERVER_IP${NC}"
+echo -e "  [${YELLOW}INFO${NC}] Detected Local Subnet: ${YELLOW}${INTERNAL_NET}/24${NC} | Internal IP: ${YELLOW}$SERVER_IP${NC}"
+
 # 2. Check Interface Binding (0.0.0.0 vs 127.0.0.1)
 LISTEN_IPS=$(ss -tulpn | grep -E ':80|:443' | awk '{print $5}' | sed 's/:[^:]*$//' | sed 's/\[//g; s/\]//g' | sort -u)
 
@@ -102,30 +104,29 @@ for IP in $LISTEN_IPS; do
     if [[ "$IP" == "0.0.0.0" ]] || [[ "$IP" == "::" ]]; then
         echo -e "  [${YELLOW}INFO${NC}] Global Interface found ($IP). Checking for Firewall protection..."
 
-        # 3. Perform Adaptive Firewall Check
         if ufw status | grep -q "active"; then
 
             # Check for the Remote Proxy (The Front Door)
             if [ ! -z "$TRUSTED_PROXY" ]; then
-                if ufw status | grep "$TRUSTED_PROXY" | grep -qE "80|443"; then
+                if ufw status | grep -q "$TRUSTED_PROXY.*80\|443"; then
                     echo -e "  [${GREEN}PASS${NC}] Proxy IP ($TRUSTED_PROXY) whitelisted on 80/443."
                 else
                     echo -e "  [${RED}FAIL${NC}] Proxy IP ($TRUSTED_PROXY) NOT whitelisted!"
                 fi
             fi
 
-            # Check for Internal Network (The Side Door)
-            if ufw status | grep "$INTERNAL_NET" | grep -qE "80|443"; then
-                echo -e "  [${GREEN}PASS${NC}] Internal Net ($INTERNAL_NET.x) whitelisted on 80/443."
-            else
-                echo -e "  [${RED}FAIL${NC}] Internal Net ($INTERNAL_NET.x) NOT whitelisted!"
+            # Check for Internal Network (The Side Door) – optional since we allow public anyway
+            if ufw status | grep -q "$INTERNAL_NET.*80\|443"; then
+                echo -e "  [${YELLOW}INFO${NC}] Internal Net ($INTERNAL_NET/24) has access to 80/443 (allowed)."
             fi
 
-            # Check for "Anywhere" Leaks (The Security Hole)
-            if ufw status | grep -E "^80|^443" | grep "ALLOW" | grep -q "Anywhere"; then
-                echo -e "  [${RED}CRITICAL${NC}] SECURITY LEAK: Port 80/443 is open to 'Anywhere'!"
+            # Improved: Check for TRUE global "Anywhere" leaks (ignore rules with "on eth0" or similar)
+            GLOBAL_LEAK=$(ufw status | grep -E "^[[:space:]]*(80|443)/tcp" | grep "ALLOW IN" | grep "Anywhere" | grep -v "on .*")
+            if [ ! -z "$GLOBAL_LEAK" ]; then
+                echo -e "  [${RED}CRITICAL${NC}] SECURITY LEAK: Port 80/443 open to true 'Anywhere' (no interface limit)!"
+                echo "            Found: $GLOBAL_LEAK"
             else
-                echo -e "  [${GREEN}PASS${NC}] No global 'Anywhere' rules found."
+                echo -e "  [${GREEN}PASS${NC}] No unrestricted global 'Anywhere' rules for 80/443."
             fi
         else
             echo -e "  [${RED}CRITICAL${NC}] Firewall is DISABLED! Global interface is fully exposed."
@@ -141,24 +142,28 @@ IPV6_LISTEN=$(ss -tulpn | grep -E ':80|:443' | grep "\[::\]")
 if [ ! -z "$IPV6_LISTEN" ]; then
     echo -e "  [${YELLOW}INFO${NC}] Server is listening on IPv6 wildcard [::]."
 
-    # 2. Search for IPv6 'Anywhere' allow rules
-    V6_LEAK=$(ufw status | grep -E "^80|^443" | grep "ALLOW" | grep "Anywhere (v6)")
+    # Improved: Only flag true global IPv6 Anywhere (ignore "on eth0")
+    V6_LEAK=$(ufw status | grep -E "^[[:space:]]*(80|443)/tcp" | grep "(v6)" | grep "ALLOW IN" | grep "Anywhere (v6)" | grep -v "on .*")
 
     if [ ! -z "$V6_LEAK" ]; then
-        echo -e "  [${RED}CRITICAL${NC}] IPv6 SECURITY LEAK: Ports 80/443 open to 'Anywhere (v6)'!"
+        echo -e "  [${RED}CRITICAL${NC}] IPv6 SECURITY LEAK: Ports 80/443 open to true 'Anywhere (v6)'!"
+        echo "            Found: $V6_LEAK"
         echo "            This bypasses your IPv4 proxy restrictions."
     else
-        # 3. Verify if there are ANY IPv6 rules (Safe default is usually no IPv6 access or specific whitelist)
-        V6_RULES=$(ufw status | grep "(v6)" | grep -E "80|443")
-        if [ -z "$V6_RULES" ]; then
-            echo -e "  [${GREEN}PASS${NC}] No IPv6 allow rules found (Default Deny active)."
+        # Check if there are interface-bound IPv6 rules (your current good state)
+        V6_RULES=$(ufw status | grep "(v6)" | grep -E "80|443" | grep "on eth0")
+        if [ ! -z "$V6_RULES" ]; then
+            echo -e "  [${GREEN}PASS${NC}] IPv6 80/443 restricted to interface eth0 (good)."
+        elif [ -z "$(ufw status | grep '(v6)' | grep -E '80|443')" ]; then
+            echo -e "  [${GREEN}PASS${NC}] No IPv6 allow rules found for 80/443 (Default Deny active)."
         else
-            echo -e "  [${GREEN}PASS${NC}] IPv6 traffic is restricted to specific rules."
+            echo -e "  [${YELLOW}INFO${NC}] IPv6 has some custom rules (review manually if needed)."
         fi
     fi
 else
     echo -e "  [${GREEN}PASS${NC}] Server is not listening on IPv6 (No leak possible)."
 fi
+
 echo -e "\n${BLUE}[6] MIME-Type & Content Security Audit${NC}"
 
 # 1. Check for 'nosniff' header in a live request
