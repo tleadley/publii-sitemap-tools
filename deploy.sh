@@ -19,7 +19,11 @@ echo "🔄 Starting deployment..."
 
 # Update package list and install required Python package
 apt update -qq
-apt install -y python3-bs4
+apt install -y python3-bs4 lighttpd-mod-magnet ufw
+
+lighttpd-enable-mod rewrite setenv
+
+service lighttpd force-reload
 
 echo "📦 Copying files from Git repository..."
 
