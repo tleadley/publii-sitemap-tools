@@ -5,6 +5,7 @@
 # ------------------------------------------------------------------------------
 
 set -euo pipefail
+INTERNAL_NET="192.168.1.0/24"
 
 # Optional: Reset UFW to defaults first (uncomment if you want a clean slate)
 # echo "Resetting UFW to defaults..."
@@ -13,13 +14,17 @@ set -euo pipefail
 # ufw default allow outgoing
 # ufw limit from 10.150.16.0/24 to any port 22 proto tcp comment 'Rate-limited internal SSH'
 
+# Uncoment to add your gateway/proxy
+# GETWAY_PROXY="192.168.1.1"
+# ufw allow from "$GETWAY_PROXY" to any port 80,443 proto tcp
+
 echo "Enabling UFW if not already active..."
 ufw --force enable >/dev/null || true
 
 # 1. Internal services (SSH + custom port) – restricted to your subnet
 echo "Adding internal-only rules..."
-ufw allow from 10.150.16.0/24 to any port 22 proto tcp comment 'Internal SSH'
-ufw allow from 10.150.16.0/24 to any port 61209 proto tcp comment 'Internal custom service (61209)'
+ufw allow from "$INTERNAL_NET" to any port 22 proto tcp comment 'Internal SSH'
+ufw allow from "$INTERNAL_NET" to any port 61209 proto tcp comment 'Internal custom service (61209)'
 
 # 2. Loopback (harmless/default, but explicit for completeness)
 ufw allow in on lo to any comment 'Loopback IPv4'
