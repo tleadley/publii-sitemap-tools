@@ -88,7 +88,6 @@ echo -e "\n${YELLOW}  --- Port Exposure Audit ---${NC}"
 echo -e "\n${BLUE}[5] Adaptive Network & Trust Validation${NC}"
 
 # 1. Identify the 'Expected' trusted actors
-TRUSTED_PROXY=$(lighttpd -p -f /etc/lighttpd/lighttpd.conf | grep "extforward.forwarder" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -n 1)
 # Detect the local subnet dynamically (e.g. 10.150)
 INTERNAL_NET=$(ip -o -f inet addr show $(ip route | grep default | awk '{print $5}') | awk '{print $4}' | cut -d/ -f1 | cut -d. -f1-3 | head -n1).0  # adjusted to full /24 prefix like 10.150.16.0
 
@@ -100,34 +99,56 @@ echo -e "  [${YELLOW}INFO${NC}] Detected Local Subnet: ${YELLOW}${INTERNAL_NET}/
 # 2. Check Interface Binding (0.0.0.0 vs 127.0.0.1)
 LISTEN_IPS=$(ss -tulpn | grep -E ':80|:443' | awk '{print $5}' | sed 's/:[^:]*$//' | sed 's/\[//g; s/\]//g' | sort -u)
 
+mapfile -t TRUSTED_PROXIES < <(
+    lighttpd -p -f /etc/lighttpd/lighttpd.conf \
+      | grep -A 5 "extforward.forwarder" \
+      | grep -oE '"[0-9a-fA-F.:]+"' \
+      | tr -d '"'
+)
+
+# Optional: clean up and remove loopback if you don't want to check ::1 / 127.0.0.1
+TRUSTED_PROXIES=($(printf '%s\n' "${TRUSTED_PROXIES[@]}" | grep -vE '^(127\.0\.0\.1|::1)$'))
+
+if [ ${#TRUSTED_PROXIES[@]} -eq 0 ]; then
+    echo -e "  [${RED}WARNING${NC}] No trusted proxy IPs found in lighttpd config!"
+fi
+
 for IP in $LISTEN_IPS; do
     if [[ "$IP" == "0.0.0.0" ]] || [[ "$IP" == "::" ]]; then
         echo -e "  [${YELLOW}INFO${NC}] Global Interface found ($IP). Checking for Firewall protection..."
 
         if ufw status | grep -q "active"; then
 
-            # Check for the Remote Proxy (The Front Door)
-            if [ ! -z "$TRUSTED_PROXY" ]; then
-                if ufw status | grep -q "$TRUSTED_PROXY.*80\|443"; then
-                    echo -e "  [${GREEN}PASS${NC}] Proxy IP ($TRUSTED_PROXY) whitelisted on 80/443."
-                else
-                    echo -e "  [${RED}FAIL${NC}] Proxy IP ($TRUSTED_PROXY) NOT whitelisted!"
+            # ── Check for Remote Proxy (The Front Door) ──
+            PROXY_WHITELISTED=false
+            for PROXY in "${TRUSTED_PROXIES[@]}"; do
+                if ufw status | grep -q "$PROXY" && ufw status | grep -qE "(80|443)"; then
+                    echo -e "  [${GREEN}PASS${NC}] Proxy IP ($PROXY) appears whitelisted for 80/443."
+                    PROXY_WHITELISTED=true
                 fi
+            done
+
+            if ! $PROXY_WHITELISTED && [ ${#TRUSTED_PROXIES[@]} -gt 0 ]; then
+                echo -e "  [${RED}FAIL${NC}] None of the trusted proxies (${TRUSTED_PROXIES[*]}) found in UFW rules for 80/443!"
+            elif [ ${#TRUSTED_PROXIES[@]} -eq 0 ]; then
+                echo -e "  [${YELLOW}SKIP${NC}] No trusted proxies defined – proxy check skipped."
             fi
 
-            # Check for Internal Network (The Side Door) – optional since we allow public anyway
-            if ufw status | grep -q "$INTERNAL_NET.*80\|443"; then
+            # ── Internal Network check (optional/info only) ──
+            if ufw status | grep -qE "$INTERNAL_NET.*(80|443)"; then
                 echo -e "  [${YELLOW}INFO${NC}] Internal Net ($INTERNAL_NET/24) has access to 80/443 (allowed)."
             fi
 
-            # Improved: Check for TRUE global "Anywhere" leaks (ignore rules with "on eth0" or similar)
+            # ── Check for TRUE global "Anywhere" leaks (ignore interface-bound rules) ──
             GLOBAL_LEAK=$(ufw status | grep -E "^[[:space:]]*(80|443)/tcp" | grep "ALLOW IN" | grep "Anywhere" | grep -v "on .*")
-            if [ ! -z "$GLOBAL_LEAK" ]; then
+
+            if [ -n "$GLOBAL_LEAK" ]; then
                 echo -e "  [${RED}CRITICAL${NC}] SECURITY LEAK: Port 80/443 open to true 'Anywhere' (no interface limit)!"
                 echo "            Found: $GLOBAL_LEAK"
             else
                 echo -e "  [${GREEN}PASS${NC}] No unrestricted global 'Anywhere' rules for 80/443."
             fi
+
         else
             echo -e "  [${RED}CRITICAL${NC}] Firewall is DISABLED! Global interface is fully exposed."
         fi
