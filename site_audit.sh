@@ -119,7 +119,7 @@ for IP in $LISTEN_IPS; do
 
         if ufw status | grep -q "active"; then
 
-            # ── Check for Remote Proxy (The Front Door) ──
+            #  Check for Remote Proxy (The Front Door)
             PROXY_WHITELISTED=false
             for PROXY in "${TRUSTED_PROXIES[@]}"; do
                 if ufw status | grep -q "$PROXY" && ufw status | grep -qE "(80|443)"; then
@@ -134,12 +134,12 @@ for IP in $LISTEN_IPS; do
                 echo -e "  [${YELLOW}SKIP${NC}] No trusted proxies defined – proxy check skipped."
             fi
 
-            # ── Internal Network check (optional/info only) ──
+            #  Internal Network check (optional/info only)
             if ufw status | grep -qE "$INTERNAL_NET.*(80|443)"; then
                 echo -e "  [${YELLOW}INFO${NC}] Internal Net ($INTERNAL_NET/24) has access to 80/443 (allowed)."
             fi
 
-            # ── Check for TRUE global "Anywhere" leaks (ignore interface-bound rules) ──
+            #  Check for TRUE global "Anywhere" leaks (ignore interface-bound rules)
             GLOBAL_LEAK=$(ufw status | grep -E "^[[:space:]]*(80|443)/tcp" | grep "ALLOW IN" | grep "Anywhere" | grep -v "on .*")
 
             if [ -n "$GLOBAL_LEAK" ]; then
