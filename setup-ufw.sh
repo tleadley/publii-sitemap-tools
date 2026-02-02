@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------------
 
 set -euo pipefail
-INTERNAL_NET="192.168.1.0/24"
+INTERNAL_NET=$(ip -o -4 route show scope link | awk '{print $1; exit}')
 
 # Optional: Reset UFW to defaults first (uncomment if you want a clean slate)
 # echo "Resetting UFW to defaults..."
