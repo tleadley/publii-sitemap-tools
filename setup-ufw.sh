@@ -16,7 +16,7 @@ INTERNAL_NET=$(ip -o -4 route show scope link | awk '{print $1; exit}')
 
 # Uncoment to add your gateway/proxy
 # GETWAY_PROXY="192.168.1.1"
-# ufw allow from "$GETWAY_PROXY" to any port 80,443 proto tcp
+# ufw allow from "$GETWAY_PROXY" to any port 80,443 proto tcp comment 'Proxy or Gateway Whitelist'
 
 echo "Enabling UFW if not already active..."
 ufw --force enable >/dev/null || true
