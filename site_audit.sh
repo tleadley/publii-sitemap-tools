@@ -119,7 +119,7 @@ for IP in $LISTEN_IPS; do
 
         if ufw status | grep -q "active"; then
 
-            #  Check for Remote Proxy (The Front Door)
+            # Check for Remote Proxy (The Front Door)
             PROXY_WHITELISTED=false
             for PROXY in "${TRUSTED_PROXIES[@]}"; do
                 if ufw status | grep -q "$PROXY" && ufw status | grep -qE "(80|443)"; then
@@ -131,15 +131,15 @@ for IP in $LISTEN_IPS; do
             if ! $PROXY_WHITELISTED && [ ${#TRUSTED_PROXIES[@]} -gt 0 ]; then
                 echo -e "  [${RED}FAIL${NC}] None of the trusted proxies (${TRUSTED_PROXIES[*]}) found in UFW rules for 80/443!"
             elif [ ${#TRUSTED_PROXIES[@]} -eq 0 ]; then
-                echo -e "  [${YELLOW}SKIP${NC}] No trusted proxies defined – proxy check skipped."
+                echo -e "  [${YELLOW}SKIP${NC}] No trusted proxies defined â proxy check skipped."
             fi
 
-            #  Internal Network check (optional/info only)
+            # â Internal Network check (optional/info only)
             if ufw status | grep -qE "$INTERNAL_NET.*(80|443)"; then
                 echo -e "  [${YELLOW}INFO${NC}] Internal Net ($INTERNAL_NET/24) has access to 80/443 (allowed)."
             fi
 
-            #  Check for TRUE global "Anywhere" leaks (ignore interface-bound rules)
+            # â Check for TRUE global "Anywhere" leaks (ignore interface-bound rules)
             GLOBAL_LEAK=$(ufw status | grep -E "^[[:space:]]*(80|443)/tcp" | grep "ALLOW IN" | grep "Anywhere" | grep -v "on .*")
 
             if [ -n "$GLOBAL_LEAK" ]; then
@@ -155,7 +155,7 @@ for IP in $LISTEN_IPS; do
     fi
 done
 
-echo -e "  ${BLUE}--- IPv6 Exposure Audit ---${NC}"
+echo -e "  ${YELLOW}--- IPv6 Exposure Audit ---${NC}"
 
 # 1. Check if the server is actually listening on IPv6
 IPV6_LISTEN=$(ss -tulpn | grep -E ':80|:443' | grep "\[::\]")
@@ -235,7 +235,7 @@ fi
 
 echo -e "\n${BLUE}[9]Debug Leak Test${NC}"
 # --- [TEST] Internal Trust & Debug Headers ---
-echo -e "${BLUE}  Testing Internal Trust Logic${NC}"
+echo -e "${YELLOW}  Testing Internal Trust Logic${NC}"
 
 # We simulate a request from a trusted internal IP
 TEST_IP="$SERVER_IP"
@@ -248,7 +248,7 @@ else
 fi
 
 # --- [TEST] External Masking ---
-echo -e "${BLUE}  Testing External Masking${NC}"
+echo -e "${YELLOW}  Testing External Masking${NC}"
 
 # We simulate a request from a public IP (e.g., Google DNS)
 EXTERNAL_CHECK=$(curl -s -I -H "X-Forwarded-For: 8.8.8.8" http://localhost | grep "X-Debug")
