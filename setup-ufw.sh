@@ -12,7 +12,7 @@ INTERNAL_NET=$(ip -o -4 route show scope link | awk '{print $1; exit}')
 # ufw --force reset
 # ufw default deny incoming
 # ufw default allow outgoing
-# ufw limit from 10.150.16.0/24 to any port 22 proto tcp comment 'Rate-limited internal SSH'
+# ufw limit from "$INTERNAL_NET" to any port 22 proto tcp comment 'Rate-limited internal SSH'
 
 # Uncoment to add your gateway/proxy
 # GETWAY_PROXY="192.168.1.1"
