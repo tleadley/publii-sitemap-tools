@@ -15,7 +15,7 @@ This project solves the "Relative URL" conflict in Publii: it allows you to main
 - **Full Image SEO:** Maps every <image:image> location.
 - **Professional Styling:** Includes an XSLT stylesheet to make sitemaps human-readable.
 - **Linux Native Automation:** Uses Systemd Path Units to trigger updates the millisecond you sync from Publii.
-- **Permission Auto-Fix:** Automatically handles "root-owned" file issues by resetting ownership to www-data.
+- **Permission Auto-Fix:** Automatically handles "www-data" file issues by resetting ownership to root.
 
 ## 🚀 Installation
 ### 1. Prerequisites
